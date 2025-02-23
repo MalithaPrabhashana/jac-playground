@@ -57,7 +57,7 @@ def run_jac_code(jac: JacCode):
         # Substitute inputs in code
         processed_code = substitute_inputs(jac.code, jac.inputs)
 
-        filename = f"temp_{uuid.uuid4().hex}.jac"
+        filename = f"/temp_{uuid.uuid4().hex}.jac"
         with open(filename, "w") as f:
             f.write(processed_code)
 
@@ -74,5 +74,18 @@ def run_jac_code(jac: JacCode):
         subprocess.run(["jac", "clean"])
         return {"output": output, "error": error}
 
+    except Exception as e:
+        return {"error": str(e)}
+
+
+
+@app.get("/debug")
+def check_installed_packages():
+    import sys
+    import subprocess
+
+    try:
+        result = subprocess.run([sys.executable, "-m", "pip", "list"], capture_output=True, text=True)
+        return {"installed_packages": result.stdout}
     except Exception as e:
         return {"error": str(e)}
