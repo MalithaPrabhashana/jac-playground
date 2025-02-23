@@ -16,13 +16,16 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 class InputData(BaseModel):
     value: str
     type: str
 
+
 class JacCode(BaseModel):
     code: str
     inputs: list[InputData]
+
 
 def convert_input(input_data: InputData):
     """Convert input value to the appropriate type."""
@@ -35,16 +38,18 @@ def convert_input(input_data: InputData):
     else:
         raise ValueError(f"Unsupported input type: {input_data.type}")
 
+
 def substitute_inputs(code: str, inputs: list[InputData]) -> str:
     """Replace input() calls with provided values sequentially."""
-    input_iter = iter(inputs)  # Create an iterator over input values
+    input_iter = iter(inputs)
 
     def replacer(match):
-        input_data = next(input_iter)  # Get the next input value
-        return str(convert_input(input_data))  # Replace input() with actual value
+        input_data = next(input_iter)
+        return str(convert_input(input_data))
 
     input_pattern = r"input\s*\(\s*\)"
     return re.sub(input_pattern, replacer, code, count=len(inputs))
+
 
 @app.post("/run")
 def run_jac_code(jac: JacCode):
@@ -57,8 +62,8 @@ def run_jac_code(jac: JacCode):
             f.write(processed_code)
 
         process = subprocess.run(
-            ["jac", "run", filename], 
-            capture_output=True, 
+            ["jac", "run", filename],
+            capture_output=True,
             text=True
         )
 
