@@ -2,6 +2,7 @@ import subprocess
 import os
 import uuid
 import re
+import tempfile
 from fastapi import FastAPI
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
@@ -57,7 +58,7 @@ def run_jac_code(jac: JacCode):
         # Substitute inputs in code
         processed_code = substitute_inputs(jac.code, jac.inputs)
 
-        filename = f"/temp_{uuid.uuid4().hex}.jac"
+        filename = os.path.join(tempfile.gettempdir(), f"temp_{uuid.uuid4().hex}.jac")
         with open(filename, "w") as f:
             f.write(processed_code)
 

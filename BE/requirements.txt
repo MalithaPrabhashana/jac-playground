@@ -1,2 +1,4 @@
-jaclang
 fastapi[standard]
+uvicorn
+jaclang
+pydantic
