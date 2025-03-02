@@ -33,6 +33,23 @@ const App = () => {
   }, [code]);
 
 
+  // Run event Ctrl + Enter
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (event.ctrlKey && event.key === 'Enter') {
+        runCode();
+      }
+    };
+    
+    window.addEventListener('keydown', handleKeyDown);
+  
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
+  
+
+
   const runCode = async () => {
     setOutput("");
     setError("");
