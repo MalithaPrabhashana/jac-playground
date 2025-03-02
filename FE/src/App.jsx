@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import Editor from "@monaco-editor/react";
 import jaclogo from "./assets/logo.png";
+import { registerJacSuggestions } from "./jacSuggestions";
 
 const App = () => {
   const [code, setCode] = useState("with entry { \n\tprint('Welcome to Jac'); \n}");
@@ -10,6 +11,11 @@ const App = () => {
   const [inputMode, setInputMode] = useState(false);
   const [loading, setLoading] = useState(false);
   const [inputVars, setInputVars] = useState([]);
+
+
+  const handleEditorDidMount = (editor, monaco) => {
+    registerJacSuggestions(monaco); // Register Jac Suggestions
+  };
 
   useEffect(() => {
     // Extract input variable names from the code
@@ -22,10 +28,10 @@ const App = () => {
         vars.push(inputVar);
       }
     }
-  
+
     setInputVars(vars.map((varName) => ({ name: varName, value: "", type: "str" })));
   }, [code]);
-  
+
 
   const runCode = async () => {
     setOutput("");
@@ -50,7 +56,8 @@ const App = () => {
     console.log({ code, inputs: formattedInputs });
 
     try {
-      const response = await fetch("https://jac-playground-hbgebubreqgxgjcb.canadacentral-01.azurewebsites.net/run", {
+      // const response = await fetch("https://jac-playground-hbgebubreqgxgjcb.canadacentral-01.azurewebsites.net/run", {
+      const response = await fetch("http://localhost:8000/run", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ code, inputs: formattedInputs }),
@@ -77,14 +84,15 @@ const App = () => {
         {/* Code Editor */}
         <div className="bg-gray-800 shadow-lg rounded-lg p-4 flex flex-col h-full md:col-span-2">
           <span className="text-lg font-medium">Code Editor</span>
-          <Editor
-            height="100%"
-            defaultLanguage="python"
-            theme="vs-dark"
-            value={code}
-            onChange={(value) => setCode(value || "")}
-            options={{ fontSize: 18, wordWrap: "on" }}
-          />
+            <Editor
+              height="100%"
+              defaultLanguage="jac"
+              theme="vs-dark"
+              value={code}
+              onChange={(value) => setCode(value || "")}
+              options={{ fontSize: 18, wordWrap: "on" }}
+              onMount={handleEditorDidMount}
+            />
           <button
             className="mt-4 w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition flex items-center justify-center space-x-2"
             onClick={runCode}
