@@ -73,8 +73,8 @@ const App = () => {
     console.log({ code, inputs: formattedInputs });
 
     try {
-      // const response = await fetch("https://jac-playground-hbgebubreqgxgjcb.canadacentral-01.azurewebsites.net/run", {
-      const response = await fetch("http://localhost:8000/run", {
+      const response = await fetch("https://jac-playground-hbgebubreqgxgjcb.canadacentral-01.azurewebsites.net/run", {
+      // const response = await fetch("http://localhost:8000/run", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ code, inputs: formattedInputs }),
