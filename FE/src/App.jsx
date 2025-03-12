@@ -145,7 +145,7 @@ captured_output.getvalue()
             theme="vs-dark"
             value={code}
             onChange={(value) => setCode(value || "")}
-            options={{ fontSize: 18, wordWrap: "on" }}
+            options={{ fontSize: 17, wordWrap: "on" }}
             onMount={handleEditorDidMount}
           />
           <button
