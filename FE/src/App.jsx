@@ -41,14 +41,12 @@ const App = () => {
         runCode();
       }
     };
-
     window.addEventListener('keydown', handleKeyDown);
 
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
   }, []);
-
 
 
   const runCode = async () => {
@@ -61,7 +59,6 @@ const App = () => {
       setLoading(false);
       return;
     }
-
     await executeCode(inputs);
   };
 
@@ -131,35 +128,6 @@ captured_output.getvalue()
       setOutput(`Error: ${error}`);
     }
   };
-
-
-
-  // const executeCode = async (inputsArray) => {
-  //   const formattedInputs = inputsArray.map((input) => {
-  //     const [value, type] = input.split(":");
-  //     return { value: value.trim(), type: type ? type.trim() : "str" };
-  //   });
-
-  //   console.log({ code, inputs: formattedInputs });
-
-  //   try {
-  //     const response = await fetch("https://jac-playground-hbgebubreqgxgjcb.canadacentral-01.azurewebsites.net/run", {
-  //     // const response = await fetch("http://localhost:8000/run", {
-  //       method: "POST",
-  //       headers: { "Content-Type": "application/json" },
-  //       body: JSON.stringify({ code, inputs: formattedInputs }),
-  //     });
-
-  //     const data = await response.json();
-  //     setOutput(data.output || "");
-  //     setError(data.error || "");
-  //     setInputs([]);
-  //   } catch {
-  //     setError("Failed to connect to Backend.");
-  //   }
-  //   setLoading(false);
-  //   setInputMode(false);
-  // };
 
   return (
     <div className="flex flex-col items-center justify-center h-screen w-screen bg-gray-900 text-white p-4">
