@@ -11,7 +11,6 @@ const App = () => {
   const [inputMode, setInputMode] = useState(false);
   const [loading, setLoading] = useState(false);
   const [inputVars, setInputVars] = useState([]);
-  const [pyodide, setPyodide] = useState(null);
 
 
   const handleEditorDidMount = (editor, monaco) => {
@@ -41,12 +40,14 @@ const App = () => {
         runCode();
       }
     };
+    
     window.addEventListener('keydown', handleKeyDown);
-
+  
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
   }, []);
+  
 
 
   const runCode = async () => {
@@ -59,74 +60,35 @@ const App = () => {
       setLoading(false);
       return;
     }
+
     await executeCode(inputs);
   };
 
+  const executeCode = async (inputsArray) => {
+    const formattedInputs = inputsArray.map((input) => {
+      const [value, type] = input.split(":");
+      return { value: value.trim(), type: type ? type.trim() : "str" };
+    });
 
-  useEffect(() => {
-    const loadPyodideAndJacLang = async () => {
-      setLoading(true);
-      try {
-        const pyodideInstance = await loadPyodide();
-        await pyodideInstance.loadPackage('micropip');
-        await pyodideInstance.runPythonAsync(`
-                import micropip
-                await micropip.install("jaclang==0.7.0")
-            `);
-
-        // Check if JacLang is installed
-        await pyodideInstance.runPythonAsync(`
-                import jaclang
-                print("JacLang is available!")
-            `);
-
-        setPyodide(pyodideInstance);
-      } catch (error) {
-        console.error('Error loading Pyodide or JacLang:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (!pyodide) {
-      loadPyodideAndJacLang();      
-    }
-  }, []);
-
-
-  // Function to handle running JacLang code
-  const runJacCode = async () => {
-    if (!pyodide) return;
-
-    setOutput('');
+    console.log({ code, inputs: formattedInputs });
 
     try {
-      const result = await pyodide.runPythonAsync(`
-from jaclang.cli.cli import run
-import sys
-from io import StringIO
+      const response = await fetch("https://jac-playground-hbgebubreqgxgjcb.canadacentral-01.azurewebsites.net/run", {
+      // const response = await fetch("http://localhost:8000/run", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code, inputs: formattedInputs }),
+      });
 
-# Capture both stdout and stderr
-captured_output = StringIO()
-sys.stdout = captured_output
-sys.stderr = captured_output
-
-jac_code = '''${code}'''
-
-# Create a temporary file using the input code and run it directly
-with open("/tmp/temp.jac", "w") as f:
-    f.write(jac_code)
-run("/tmp/temp.jac")
-
-# Get the captured output
-sys.stdout = sys.__stdout__
-sys.stderr = sys.__stderr__
-captured_output.getvalue()
-`);
-      setOutput(result || "No output");
-    } catch (error) {
-      setOutput(`Error: ${error}`);
+      const data = await response.json();
+      setOutput(data.output || "");
+      setError(data.error || "");
+      setInputs([]);
+    } catch {
+      setError("Failed to connect to Backend.");
     }
+    setLoading(false);
+    setInputMode(false);
   };
 
   return (
@@ -139,18 +101,18 @@ captured_output.getvalue()
         {/* Code Editor */}
         <div className="bg-gray-800 shadow-lg rounded-lg p-4 flex flex-col h-full md:col-span-2">
           <span className="text-lg font-medium">Code Editor</span>
-          <Editor
-            height="100%"
-            defaultLanguage="jac"
-            theme="vs-dark"
-            value={code}
-            onChange={(value) => setCode(value || "")}
-            options={{ fontSize: 18, wordWrap: "on" }}
-            onMount={handleEditorDidMount}
-          />
+            <Editor
+              height="100%"
+              defaultLanguage="jac"
+              theme="vs-dark"
+              value={code}
+              onChange={(value) => setCode(value || "")}
+              options={{ fontSize: 18, wordWrap: "on" }}
+              onMount={handleEditorDidMount}
+            />
           <button
             className="mt-4 w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition flex items-center justify-center space-x-2"
-            onClick={runJacCode}
+            onClick={runCode}
             disabled={loading}
           >
             {loading ? 'Running...' : 'Run Jac Code'}
