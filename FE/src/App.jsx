@@ -80,6 +80,13 @@ const App = () => {
 
     setOutput('');
 
+    const escapedCode = code
+    .replace(/\\/g, '\\\\')
+    .replace(/'/g, "\\'")
+    .replace(/"/g, '\\"')
+    .replace(/\n/g, '\\n')
+    .replace(/\r/g, '\\r');
+
     try {
       const result = await pyodide.runPythonAsync(`
 from jaclang.cli.cli import run
@@ -91,7 +98,7 @@ captured_output = StringIO()
 sys.stdout = captured_output
 sys.stderr = captured_output
 
-jac_code = '''${code}'''
+jac_code = '''${escapedCode}'''
 
 # Create a temporary file using the input code and run it directly
 with open("/tmp/temp.jac", "w") as f:
