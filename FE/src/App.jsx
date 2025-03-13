@@ -80,12 +80,7 @@ const App = () => {
 
     setOutput('');
 
-    const escapedCode = code
-    .replace(/\\/g, '\\\\')
-    .replace(/'/g, "\\'")
-    .replace(/"/g, '\\"')
-    .replace(/\n/g, '\\n')
-    .replace(/\r/g, '\\r');
+    const safeCode = JSON.stringify(code);
 
     try {
       const result = await pyodide.runPythonAsync(`
@@ -98,7 +93,7 @@ captured_output = StringIO()
 sys.stdout = captured_output
 sys.stderr = captured_output
 
-jac_code = '''${escapedCode}'''
+jac_code = ${safeCode}
 
 # Create a temporary file using the input code and run it directly
 with open("/tmp/temp.jac", "w") as f:
