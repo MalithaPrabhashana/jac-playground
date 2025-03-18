@@ -16,32 +16,14 @@ const App = () => {
     registerJacSuggestions(monaco); // Register Jac Suggestions
   };
 
-
-  // Run event Ctrl + Enter
-  useEffect(() => {
-    const handleKeyDown = (event) => {
-      if (event.ctrlKey && event.key === 'Enter') {
-        runJacCode();
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-    };
-  }, []);
-
-
   useEffect(() => {
     const loadPyodideAndJacLang = async () => {
       setLoading(true);
       try {
-        const pyodideInstance = await loadPyodide();
-        await pyodideInstance.loadPackage('micropip');
-        await pyodideInstance.runPythonAsync(`
-                import micropip
-                await micropip.install("jaclang==0.7.0")
-            `);
+        const pyodideInstance = await loadPyodide({
+          indexURL: "https://v0-new-project-geldjhq4kjw.vercel.app/"
+        });
+        await pyodideInstance.loadPackage('jaclang');
 
         // Check if JacLang is installed
         await pyodideInstance.runPythonAsync(`
