@@ -21,15 +21,40 @@ const App = () => {
       setLoading(true);
       try {
         const pyodideInstance = await loadPyodide({
-          indexURL: "https://v0-new-project-geldjhq4kjw.vercel.app/"
+          indexURL: "https://cdn.jsdelivr.net/pyodide/v0.27.0/full/",
         });
-        await pyodideInstance.loadPackage('jaclang');
+
+        const response = await fetch("jaclang.zip"); // Store JacLang as a ZIP in your frontend
+        const buffer = await response.arrayBuffer();
+        const data = new Uint8Array(buffer);
+
+        // Write the zip file to Pyodide's filesystem
+        await pyodideInstance.FS.writeFile("/jaclang.zip", data);
+
+        // Extract JacLang files
+        await pyodideInstance.runPythonAsync(`
+import shutil
+import zipfile
+import os
+
+with zipfile.ZipFile("/jaclang.zip", "r") as zip_ref:
+    zip_ref.extractall("/jaclang")
+
+os.sys.path.append("/jaclang")
+print("JacLang files loaded!")
+
+print(os.listdir("/jaclang"))
+`);
 
         // Check if JacLang is installed
-        await pyodideInstance.runPythonAsync(`
-                import jaclang
-                print("JacLang is available!")
-            `);
+        try {
+          await pyodideInstance.runPythonAsync(`
+              from jaclang.cli.cli import run
+              print("JacLang is available!")
+          `);
+        } catch (validationError) {
+          console.error("JacLang is not available:", validationError);
+        }
 
         setPyodide(pyodideInstance);
         setloaded(true);
@@ -56,6 +81,7 @@ const App = () => {
   }, [loaded])
 
 
+
   // Function to handle running JacLang code
   const runJacCode = async () => {
     if (!pyodide) return;
@@ -66,7 +92,6 @@ const App = () => {
 
     try {
       const result = await pyodide.runPythonAsync(`
-from jaclang.cli.cli import run
 import sys
 from io import StringIO
 
