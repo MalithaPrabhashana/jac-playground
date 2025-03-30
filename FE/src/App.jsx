@@ -22,9 +22,10 @@ const App = () => {
       try {
         const pyodideInstance = await loadPyodide({
           indexURL: "https://cdn.jsdelivr.net/pyodide/v0.27.0/full/",
+          cache: true,
         });
 
-        const response = await fetch("jaclang.zip"); // Store JacLang as a ZIP in your frontend
+        const response = await fetch("jaclang.zip");
         const buffer = await response.arrayBuffer();
         const data = new Uint8Array(buffer);
 
@@ -42,8 +43,6 @@ with zipfile.ZipFile("/jaclang.zip", "r") as zip_ref:
 
 os.sys.path.append("/jaclang")
 print("JacLang files loaded!")
-
-print(os.listdir("/jaclang"))
 `);
 
         // Check if JacLang is installed
