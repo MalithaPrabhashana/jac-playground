@@ -1,14 +1,21 @@
-<!doctype html>
+
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite + React</title>
+    <title>Jaclang Playground</title>
+    <meta name="description" content="A professional online playground for running Jaclang code in the browser" />
+
+    <meta property="og:title" content="Jaclang Playground" />
+    <meta property="og:description" content="A professional online playground for running Jaclang code in the browser" />
+    <meta name="twitter:card" content="summary_large_image" />
   </head>
+
   <body>
     <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
+    <script src="https://cdn.gpteng.co/gptengineer.js" type="module"></script>
     <script src="https://cdn.jsdelivr.net/pyodide/v0.27.0/full/pyodide.js"></script>
+    <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
