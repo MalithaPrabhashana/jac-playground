@@ -8,10 +8,8 @@ import { ExamplesSidebar } from "@/components/ExamplesSidebar";
 import { ResizablePanel } from "@/components/ResizablePanel";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { executeCode } from "@/lib/codeService";
 import { defaultCode } from "@/lib/examples";
 import { useMobileDetect } from "@/hooks/useMobileDetect";
-import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/hooks/use-toast";
 import jacLogo from "/jaseci.png";
 
@@ -55,7 +53,6 @@ with zipfile.ZipFile("/jaclang.zip", "r") as zip_ref:
 os.sys.path.append("/jaclang")
 print("JacLang files loaded!")
 `);
-
         // Check if JacLang is installed
         try {
           await pyodideInstance.runPythonAsync(`
@@ -95,11 +92,8 @@ print("JacLang files loaded!")
   // Function to handle running JacLang code
   const runJacCode = async () => {
     if (!pyodide) return;
-
     setOutput('');
-
     const safeCode = JSON.stringify(code);
-
     try {
       const result = await pyodide.runPythonAsync(`
 import sys
@@ -127,27 +121,6 @@ captured_output.getvalue()
       setOutput(`Error: ${error}`);
     }
   };
-
-  
-  // const runCode = useCallback(async () => {
-  //   try {
-  //     setIsRunning(true);
-  //     setOutput("");
-  //     const result = await executeCode(code);
-  //     setOutput(result);
-  //     console.log("Execution result:", code);
-  //   } catch (error) {
-  //     console.error("Failed to execute code:", error);
-  //     setOutput("Error: Failed to execute code.");
-  //     toast({
-  //       title: "Execution Error",
-  //       description: "Failed to execute the code.",
-  //       variant: "destructive",
-  //     });
-  //   } finally {
-  //     setIsRunning(false);
-  //   }
-  // }, [code, toast]);
 
   const handleReset = () => {
     setCode(defaultCode);
@@ -180,7 +153,7 @@ captured_output.getvalue()
         <header className="h-14 border-b bg-card flex items-center justify-between px-4">
           <div className="flex items-center space-x-2">
             <img src={jacLogo} className="w-8 h-8 mr-2" />
-            <h1 className="text-lg font-semibold bg-gradient-to-r from-primary to-primary bg-clip-text text-transparent">Jaclang Playground</h1>
+            <h1 className="text-lg font-semibold bg-gradient-to-r from-primary to-primary bg-clip-text text-transparent">Jac Playground</h1>
           </div>
           <div className="flex items-center space-x-2">
             {isMobile && (
